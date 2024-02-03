@@ -14,7 +14,7 @@ public class ClassPassGen {
     private String Generator(String passString){
         StringBuilder sb = new StringBuilder(PassLen);
         for (int i = 0; i<PassLen; i++) {
-            int index = (int) ((int)passString.length()*Math.random());
+            int index = (int)(passString.length()*Math.random());
             sb.append(passString.charAt(index));
         }
         return sb.toString();
