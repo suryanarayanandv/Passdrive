@@ -13,7 +13,7 @@ import com.github.passdrive.utils.DetectedResult;
 public class WindowsUsbDetector {
     private String detectedDevice;
     // Command
-    private final String COMMAND = WMIC_PATH + " logicaldisk where drivetype=" + 3
+    private final String COMMAND = WMIC_PATH + " logicaldisk where drivetype=" + WIN_DEVICE_TPE
             + " get drivetype,deviceid /format:csv";
 
     private DetectedResult parseDevices(InputStream devices) {
@@ -27,7 +27,7 @@ public class WindowsUsbDetector {
                 }
 
                 // Capture USB device
-                else if (line.contains("" + 3)) {
+                else if (line.contains("" + WIN_DEVICE_TPE)) {
                     String[] device = line.split(",");
                     return new DetectedResult(true, device[1]);
                 }
@@ -67,3 +67,4 @@ public class WindowsUsbDetector {
         return detectedDevice;
     }
 }
+
