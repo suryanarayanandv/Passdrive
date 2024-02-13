@@ -1,13 +1,13 @@
 package com.github.passdrive.utils;
 
-public class ClassPassGen {
+public class PassGen {
     int PassLen;
     String passString;
     String genPass;
     boolean alph;
     boolean spclCh;
     boolean num;
-    ClassPassGen(int PassLen,boolean alph, boolean spclCh, boolean num){
+    PassGen(int PassLen,boolean alph, boolean spclCh, boolean num){
         this.PassLen = PassLen;
         this.num = num;
         this.alph = alph;
@@ -23,7 +23,7 @@ public class ClassPassGen {
         return sb.toString();
     }
 
-    String PassGen(){
+    String generatePassword(){
         if(alph & spclCh & num){
             passString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz" + "1234567890" + "~`!@#$%^&*()_+-=[]|}{;':/?.>,<;";
         }
