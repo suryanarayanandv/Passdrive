@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 // TODO: IMPL
 // must have "master": "master password"
+// must have "platform": "win32" / "linux" / "darwin"
 // must implement singleton approach
 // return null if not present
 
@@ -28,6 +29,15 @@ public class EnvironmentImpl implements Environment {
     public void initMasterPassword(String masterPassword) {
         if (getInstance() != null) {
             env.put("master", masterPassword);
+        }
+    }
+
+    /*
+     * @brief Default platform for utility
+     */
+    public void initPlatform(String platform) {
+        if (getInstance() != null) {
+            env.put("platform", platform);
         }
     }
 
