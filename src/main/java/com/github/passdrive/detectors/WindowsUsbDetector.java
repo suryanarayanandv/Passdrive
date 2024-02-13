@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import com.github.passdrive.utils.DetectedResult;
+import com.github.passdrive.usbDetector.UsbDevice;
 
 public class WindowsUsbDetector {
     private String detectedDevice;
@@ -16,7 +16,7 @@ public class WindowsUsbDetector {
     private final String COMMAND = WMIC_PATH + " logicaldisk where drivetype=" + WIN_DEVICE_TPE
             + " get drivetype,deviceid /format:csv";
 
-    private DetectedResult parseDevices(InputStream devices) {
+    private UsbDevice parseDevices(InputStream devices) {
         BufferedReader temp = new BufferedReader(new InputStreamReader(devices));
         String line;
         try {
@@ -29,7 +29,7 @@ public class WindowsUsbDetector {
                 // Capture USB device
                 else if (line.contains("" + WIN_DEVICE_TPE)) {
                     String[] device = line.split(",");
-                    return new DetectedResult(true, device[1]);
+                    return new UsbDevice(true, device[1]);
                 }
             }
         } catch (IOException e) {
@@ -37,12 +37,12 @@ public class WindowsUsbDetector {
             System.out.println("Try again Later!");
             System.exit(1);
         }
-        return new DetectedResult(false, null);
+        return new UsbDevice(false, null);
     }
 
     public Boolean detect() throws InterruptedException {
         InputStream devices = null;
-        DetectedResult result = null;
+        UsbDevice result = null;
         // Detect USB
         System.out.println("Detecting USB");
         try {
@@ -52,8 +52,8 @@ public class WindowsUsbDetector {
             }
 
             // Return the detected USB
-            if (result.isDetected) {
-                detectedDevice = result.deviceVolume;
+            if (result.getIsDetected()) {
+                detectedDevice = result.getDeviceVolume();
                 return true;
             }
 
