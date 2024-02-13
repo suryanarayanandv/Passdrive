@@ -12,20 +12,45 @@ public class EnvironmentImpl implements Environment {
 
     @SuppressWarnings("rawtypes")
     public HashMap getInstance() {
-        if ( env == null ) {
+        if (env == null) {
             env = new HashMap<String, Object>();
         }
         return env;
     }
 
+    public EnvironmentImpl() {
+        getInstance();
+    }
+
+    /**
+     * @brief Inmemory master password for utility
+     */
+    public void initMasterPassword(String masterPassword) {
+        if (getInstance() != null) {
+            env.put("master", masterPassword);
+        }
+    }
+
+    public void setMultipleEnvironmentMap(HashMap<String, Object> map) {
+        if (getInstance() != null) {
+            env.putAll(map);
+        }
+    }
+
+    public void clearEnvironmentMap() {
+        if (getInstance() != null) {
+            env.clear();
+        }
+    }
+
     @Override
     public Object getEnvironmentMap(String key) {
-        throw new UnsupportedOperationException("Unimplemented method 'getEnvironmentMap'");
+        return getInstance() != null ? env.get(key) : null;
     }
 
     @Override
     public void setEnvironmentMap(String key, Object val) {
-        throw new UnsupportedOperationException("Unimplemented method 'setEnvironmentMap'");
+        Object temp = getInstance() != null ? env.put(key, val) : null;
     }
-    
+
 }
