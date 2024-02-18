@@ -2,65 +2,50 @@ package com.github.passdrive.Environment;
 
 import java.util.HashMap;
 
-// TODO: IMPL
 // must have "master": "master password"
 // must have "platform": "win32" / "linux" / "darwin"
 // must implement singleton approach
 // return null if not present
 
-public class EnvironmentImpl implements Environment {
+public class EnvironmentImpl {
     private static HashMap<String, Object> env = null;
-
-    @SuppressWarnings("rawtypes")
-    public HashMap getInstance() {
-        if (env == null) {
-            env = new HashMap<String, Object>();
-        }
-        return env;
-    }
-
-    public EnvironmentImpl() {
-        getInstance();
-    }
 
     /**
      * @brief Inmemory master password for utility
      */
     public void initMasterPassword(String masterPassword) {
-        if (getInstance() != null) {
-            env.put("master", masterPassword);
+        if (env == null) {
+            env = new HashMap<String, Object>();
         }
+        env.put("master", masterPassword);
     }
 
     /*
      * @brief Default platform for utility
      */
-    public void initPlatform(String platform) {
-        if (getInstance() != null) {
-            env.put("platform", platform);
+    public static void initPlatform(String platform) {
+        if (env == null) {
+            env = new HashMap<String, Object>();
         }
-    }
-
-    public void setMultipleEnvironmentMap(HashMap<String, Object> map) {
-        if (getInstance() != null) {
-            env.putAll(map);
-        }
+        env.put("platform", platform);
     }
 
     public void clearEnvironmentMap() {
-        if (getInstance() != null) {
-            env.clear();
+        env = null;
+    }
+
+    public static Object getEnvironmentMap(String key) {
+        if (env != null) {
+            return env.get(key);
         }
+        return false;
     }
 
-    @Override
-    public Object getEnvironmentMap(String key) {
-        return getInstance() != null ? env.get(key) : null;
-    }
-
-    @Override
-    public void setEnvironmentMap(String key, Object val) {
-        Object temp = getInstance() != null ? env.put(key, val) : null;
+    public static void setEnvironmentMap(String key, Object val) {
+        if ( env == null ) {
+            env = new HashMap<String, Object>();
+        }
+        env.put(key, val);
     }
 
 }
