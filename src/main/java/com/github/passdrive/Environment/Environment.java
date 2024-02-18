@@ -1,18 +1,13 @@
 package com.github.passdrive.Environment;
 
-import java.util.HashMap;
-
 /**
  * Environment Seperated by ';' 'key=value;..'
  * Or
  * Mapped Environment -> key: value
  */
 
-public interface Environment {
-    @SuppressWarnings("rawtypes")
-    HashMap getInstance();
+ public abstract class Environment {
+    abstract public Object getEnvironmentMap(String key);
 
-    Object getEnvironmentMap(String key);
-
-    void setEnvironmentMap(String key, Object val);
+    abstract public void setEnvironmentMap(String key, Object val);
 }
