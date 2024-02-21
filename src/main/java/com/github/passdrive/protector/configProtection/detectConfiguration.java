@@ -1,8 +1,6 @@
 package com.github.passdrive.protector.configProtection;
 
 import java.io.File;
-
-import com.github.passdrive.Environment.Environment;
 import com.github.passdrive.Environment.EnvironmentImpl;
 import com.github.passdrive.usbDetector.UsbDevice;
 
@@ -14,9 +12,8 @@ import com.github.passdrive.usbDetector.UsbDevice;
  */
 
 public class detectConfiguration {
-    public static Boolean detect(UsbDevice usbDrive, Environment environment) {
+    public static Boolean detect(UsbDevice usbDrive, EnvironmentImpl environment) {
         if (usbDrive.getIsDetected()) {
-            EnvironmentImpl env = new EnvironmentImpl();
             /**
              * 
              * volume/.protected file will be generated if
@@ -25,7 +22,7 @@ public class detectConfiguration {
              * 
              */
             String root = "";
-            env.getEnvironmentMap("root");
+            EnvironmentImpl.getEnvironmentMap("root");
 
             /**
              * Can change Root path of .protected

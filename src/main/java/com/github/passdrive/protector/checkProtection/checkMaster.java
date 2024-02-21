@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import com.github.passdrive.Environment.Environment;
 import com.github.passdrive.Environment.EnvironmentImpl;
 import com.github.passdrive.usbDetector.UsbDevice;
 
@@ -15,9 +14,8 @@ import com.github.passdrive.usbDetector.UsbDevice;
  */
 
 public class checkMaster {
-    public static Boolean check(UsbDevice usbDrive, String hashedPassword, Environment environment) {
+    public static Boolean check(UsbDevice usbDrive, String hashedPassword, EnvironmentImpl environment) {
         if (usbDrive.getIsDetected()) {
-            EnvironmentImpl env = new EnvironmentImpl();
             /**
              * 
              * If master password matches -> Env: status=true
@@ -25,7 +23,7 @@ public class checkMaster {
              * 
              */
             String root = "";
-            env.getEnvironmentMap("root");
+            EnvironmentImpl.getEnvironmentMap("root");
 
             File protect = new File(
                     "" + usbDrive.getDeviceVolume() + File.separator + root + File.separator + ".protected");
@@ -35,11 +33,11 @@ public class checkMaster {
                 FileInputStream fin = new FileInputStream(protect);
 
                 if (fin.readAllBytes().toString().equals(hashedPassword)) {
-                    environment.setEnvironmentMap("status", "true");
+                    EnvironmentImpl.setEnvironmentMap("status", "true");
                     fin.close();
                     return true;
                 } else {
-                    environment.setEnvironmentMap("status", "false");
+                    EnvironmentImpl.setEnvironmentMap("status", "false");
                 }
                 fin.close();
                 return true;
