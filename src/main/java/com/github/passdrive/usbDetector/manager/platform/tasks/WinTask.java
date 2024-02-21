@@ -1,8 +1,9 @@
-package com.github.passdrive.usbDetector.manager.platform;
+package com.github.passdrive.usbDetector.manager.platform.tasks;
 
+import com.github.passdrive.Environment.EnvironmentImpl;
+import com.github.passdrive.usbDetector.PlatformDetectorTasks.WindowsUsbDetector;
 import com.github.passdrive.usbDetector.manager.DetectTaskSchduler;
-import com.github.passdrive.usbDetector.manager.Task;
-import com.github.passdrive.usbDetector.platform.WindowsUsbDetector;
+import com.github.passdrive.usbDetector.manager.platform.interfaces.Task;
 
 // WIN Task
 public class WinTask extends Task {
@@ -18,6 +19,9 @@ public class WinTask extends Task {
         try {
             if (detector.detect()) {
                 System.out.println("USB Detected: " + detector.getDetectedDevice());
+
+                // Environment set
+                EnvironmentImpl.setEnvironmentMap("volume", detector.getDetectedDevice());
                 scheduler.stop();
             } else {
                 System.out.println("Waiting for USB device...");

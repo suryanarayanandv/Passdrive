@@ -66,19 +66,18 @@ public class AES extends Algorithm {
     // Storing secret / iv to Environment
     private static void init() {
         // Persistant Env
-        EnvironmentImpl env = new EnvironmentImpl();
 
-        String masterPassword = (String) env.getEnvironmentMap("master");
+        String masterPassword = (String) EnvironmentImpl.getEnvironmentMap("master");
         String salt = AES.getSalt();
         SecretKey secret = AES.getKeyFromPassword(masterPassword, salt);
         IvParameterSpec iv = AES.generateIv();
 
-        if (env.getEnvironmentMap("secret-aes") == null)
-            env.setEnvironmentMap("secret-aes", secret);
+        if (EnvironmentImpl.getEnvironmentMap("secret-aes") == null)
+        EnvironmentImpl.setEnvironmentMap("secret-aes", secret);
 
         // Adding secret to Environment
-        if (env.getEnvironmentMap("iv-aes") == null)
-            env.setEnvironmentMap("iv-aes", iv);
+        if (EnvironmentImpl.getEnvironmentMap("iv-aes") == null)
+        EnvironmentImpl.setEnvironmentMap("iv-aes", iv);
     }
 
     // Encryption helper function
@@ -117,18 +116,16 @@ public class AES extends Algorithm {
     @Override
     public String encrypt(String message) {
         init();
-        EnvironmentImpl env = new EnvironmentImpl();
-        SecretKey secret = (SecretKey) env.getEnvironmentMap("secret-aes");
-        IvParameterSpec iv = (IvParameterSpec) env.getEnvironmentMap("iv-aes");
+        SecretKey secret = (SecretKey) EnvironmentImpl.getEnvironmentMap("secret-aes");
+        IvParameterSpec iv = (IvParameterSpec) EnvironmentImpl.getEnvironmentMap("iv-aes");
 
         return AES.encrypt("AES/CBC/PKCS5Padding", message, secret, iv);
     }
 
     @Override
     public String decrypt(String encryptedMessage) {
-        EnvironmentImpl env = new EnvironmentImpl();
-        SecretKey secret = (SecretKey) env.getEnvironmentMap("secret");
-        IvParameterSpec iv = (IvParameterSpec) env.getEnvironmentMap("iv");
+        SecretKey secret = (SecretKey) EnvironmentImpl.getEnvironmentMap("secret");
+        IvParameterSpec iv = (IvParameterSpec) EnvironmentImpl.getEnvironmentMap("iv");
 
         return AES.decrypt("AES/CBC/PKCS5Padding", encryptedMessage, secret, iv);
     }

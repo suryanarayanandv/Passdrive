@@ -7,3 +7,5 @@ public class App
         // Application entry point
     }
 }
+
+// TODO: test + exception handle

@@ -5,8 +5,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import com.github.passdrive.Environment.Environment;
-import com.github.passdrive.usbDetector.manager.platform.LinTask;
-import com.github.passdrive.usbDetector.manager.platform.WinTask;
+import com.github.passdrive.usbDetector.manager.platform.tasks.DarTask;
+import com.github.passdrive.usbDetector.manager.platform.tasks.LinTask;
+import com.github.passdrive.usbDetector.manager.platform.tasks.WinTask;
 
 /**
  * Thread-Safe Task Scheduler
@@ -30,7 +31,7 @@ public class DetectTaskSchduler {
                 scheduler.scheduleAtFixedRate(new LinTask(this), 0, 5, TimeUnit.SECONDS);
             } else if ( os.equals("darwin") ) {
                 // Schedule the task to run every 5 seconds
-                scheduler.scheduleAtFixedRate(new LinTask(this), 0, 5, TimeUnit.SECONDS);
+                scheduler.scheduleAtFixedRate(new DarTask(this), 0, 5, TimeUnit.SECONDS);
             }
         }
     }

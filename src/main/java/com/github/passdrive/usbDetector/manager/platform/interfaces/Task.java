@@ -1,4 +1,4 @@
-package com.github.passdrive.usbDetector.manager;
+package com.github.passdrive.usbDetector.manager.platform.interfaces;
 
 public class Task extends Thread {
     @Override

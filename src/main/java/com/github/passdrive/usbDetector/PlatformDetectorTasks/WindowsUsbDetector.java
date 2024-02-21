@@ -1,4 +1,4 @@
-package com.github.passdrive.detectors;
+package com.github.passdrive.usbDetector.PlatformDetectorTasks;
 
 import static com.github.passdrive.utils.constants.UsbConstants.*;
 
@@ -8,15 +8,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import com.github.passdrive.utils.DetectedResult;
+import com.github.passdrive.usbDetector.UsbDevice;
+import com.github.passdrive.usbDetector.PlatformDetectorTasks.interfaces.UsbDetector;
 
-public class WindowsUsbDetector {
+public class WindowsUsbDetector implements UsbDetector {
     private String detectedDevice;
     // Command
     private final String COMMAND = WMIC_PATH + " logicaldisk where drivetype=" + WIN_DEVICE_TPE
             + " get drivetype,deviceid /format:csv";
 
-    private DetectedResult parseDevices(InputStream devices) {
+    private UsbDevice parseDevices(InputStream devices) {
         BufferedReader temp = new BufferedReader(new InputStreamReader(devices));
         String line;
         try {
@@ -29,20 +30,20 @@ public class WindowsUsbDetector {
                 // Capture USB device
                 else if (line.contains("" + WIN_DEVICE_TPE)) {
                     String[] device = line.split(",");
-                    return new DetectedResult(true, device[1]);
+                    return new UsbDevice(true, device[1].trim());
                 }
             }
-        } catch (IOException e) {
-            // TODO: fallback
-            System.out.println("Try again Later!");
-            System.exit(1);
+        } catch (Exception e) {
+            return new UsbDevice(false, null);
         }
-        return new DetectedResult(false, null);
+        return new UsbDevice(false, null);
     }
 
+    @Override
+    @SuppressWarnings("deprecation")
     public Boolean detect() throws InterruptedException {
         InputStream devices = null;
-        DetectedResult result = null;
+        UsbDevice result = null;
         // Detect USB
         System.out.println("Detecting USB");
         try {
@@ -52,17 +53,18 @@ public class WindowsUsbDetector {
             }
 
             // Return the detected USB
-            if (result.isDetected) {
-                detectedDevice = result.deviceVolume;
+            if (result.getIsDetected()) {
+                detectedDevice = result.getDeviceVolume();
                 return true;
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            return false;
         }
         return false;
     }
 
+    @Override
     public String getDetectedDevice() {
         return detectedDevice;
     }

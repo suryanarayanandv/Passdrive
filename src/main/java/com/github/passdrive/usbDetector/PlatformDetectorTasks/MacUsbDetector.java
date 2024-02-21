@@ -1,6 +1,4 @@
-package com.github.passdrive.usbDetector.platform;
-
-import static com.github.passdrive.utils.constants.UsbConstants.*;
+package com.github.passdrive.usbDetector.PlatformDetectorTasks;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -9,37 +7,44 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import com.github.passdrive.usbDetector.UsbDevice;
+import com.github.passdrive.usbDetector.PlatformDetectorTasks.interfaces.UsbDetector;
 
-public class WindowsUsbDetector {
-    private String detectedDevice;
+public class MacUsbDetector implements UsbDetector {
+    private String detectedDevice = "";
     // Command
-    private final String COMMAND = WMIC_PATH + " logicaldisk where drivetype=" + WIN_DEVICE_TPE
-            + " get drivetype,deviceid /format:csv";
+    private final String COMMAND = "diskutil list";
 
     private UsbDevice parseDevices(InputStream devices) {
         BufferedReader temp = new BufferedReader(new InputStreamReader(devices));
         String line;
         try {
             while ((line = temp.readLine()) != null) {
-                // Skip the first line
-                if (line.contains("Node,")) {
-                    continue;
-                }
-
-                // Capture USB device
-                else if (line.contains("" + WIN_DEVICE_TPE)) {
-                    String[] device = line.split(",");
-                    return new UsbDevice(true, device[1]);
+                // Find Usb Device
+                if ( line.contains("external") && line.contains("physical") ) {
+                    break;
                 }
             }
-        } catch (IOException e) {
-            // TODO: fallback
-            System.out.println("Try again Later!");
-            System.exit(1);
+
+            int volumeIDX = -1;
+            int limitIDX = -1;
+            line = temp.readLine();
+            if (line.contains("NAME"))
+                volumeIDX = line.indexOf("NAME");
+            if (line.contains("SIZE"))
+                limitIDX = line.indexOf("SIZE");
+
+            // Found line
+            while (!(line = temp.readLine()).contains("1")) {
+            }
+            // Line will contain Actual Usb Device
+            String volumeStr = line.substring(volumeIDX, limitIDX);
+            return new UsbDevice(true, volumeStr.trim());
+        } catch (Exception e) {
+            return new UsbDevice(false, null);
         }
-        return new UsbDevice(false, null);
     }
 
+    @Override
     @SuppressWarnings("deprecation")
     public Boolean detect() throws InterruptedException {
         InputStream devices = null;
@@ -59,13 +64,13 @@ public class WindowsUsbDetector {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            return false;
         }
         return false;
     }
 
+    @Override
     public String getDetectedDevice() {
-        return detectedDevice;
+        return this.detectedDevice;
     }
 }
-
