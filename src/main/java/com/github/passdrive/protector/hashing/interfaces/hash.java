@@ -5,8 +5,8 @@ package com.github.passdrive.protector.hashing.interfaces;
  */
 
 abstract public class hash {
-    public final Boolean checkHash(String hash, String message) {
-        return this.doHash(message).equals(hash);
+    public Boolean checkHash(String hash, String password) {
+        return this.doHash(password).equals(hash);
     }
 
     // Overridable
