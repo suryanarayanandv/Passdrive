@@ -64,7 +64,7 @@ public class AES extends Algorithm {
     }
 
     // Storing secret / iv to Environment
-    private static void init() {
+    public void init() {
         // Persistant Env
 
         String masterPassword = (String) EnvironmentImpl.getEnvironmentMap("master");
