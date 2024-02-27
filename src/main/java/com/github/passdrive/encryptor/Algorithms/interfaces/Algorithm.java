@@ -11,6 +11,8 @@ package com.github.passdrive.encryptor.Algorithms.interfaces;
 
 public abstract class Algorithm {
     // Overridable
+    abstract public void init();
+
     abstract public String encrypt(String message);
 
     abstract public String decrypt(String encryptedMessage);

@@ -7,17 +7,24 @@ import com.github.passdrive.encryptor.Algorithms.interfaces.Algorithm;
  */
 
 public class Encipher {
-    private Algorithm algorithm;
+    private static Algorithm algorithm = null;
 
-    public Encipher(Algorithm algorithm) {
-        this.algorithm = algorithm;
+    public static Algorithm getAlgorithm(String alg) {
+        if (alg.equals("AES")) {
+            Encipher.algorithm = new com.github.passdrive.encryptor.Algorithms.AES();
+        } else if (alg.equals("DES")) {
+            // Encipher.algorithm = new com.github.passdrive.encryptor.Algorithms.DES();
+        } else if (alg.equals("RSA")) {
+            // Encipher.algorithm = new com.github.passdrive.encryptor.Algorithms.RSA();
+        }
+        return algorithm;
     }
 
-    public String encryptData(String message) {
+    public static String encryptData(String message) {
         return algorithm.encrypt(message);
     }
 
-    public String decryptData(String encryptedMessage) {
+    public static String decryptData(String encryptedMessage) {
         return algorithm.decrypt(encryptedMessage);
     }
 }
