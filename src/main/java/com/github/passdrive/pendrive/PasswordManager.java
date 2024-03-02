@@ -31,8 +31,9 @@ public class PasswordManager {
             String root = "";
             EnvironmentImpl.getEnvironmentMap("root");
 
+            // TODO: check valid path (condition: //..)
             File protect = new File(
-                    "" + usb.getDeviceVolume() + File.separator + root + File.separator + ".protected");
+                    "" + usb.getDeviceVolume() + File.separator + root + ".protected");
             
             // Create .protected write master password
             try {
@@ -59,7 +60,7 @@ public class PasswordManager {
             EnvironmentImpl.getEnvironmentMap("root");
 
             File protect = new File(
-                    "" + usb.getDeviceVolume() + File.separator + root + File.separator + ".protected");
+                    "" + usb.getDeviceVolume() + File.separator + root + ".protected");
             
             try {
                 if ( !protect.exists() ) {
@@ -91,9 +92,9 @@ public class PasswordManager {
             EnvironmentImpl.getEnvironmentMap("root");
 
             File protect = new File(
-                    "" + usb.getDeviceVolume() + File.separator + root + File.separator + ".protected");
+                    "" + usb.getDeviceVolume() + File.separator + root + ".protected");
             File passwords = new File(
-                    "" + usb.getDeviceVolume() + File.separator + root + File.separator + "data");
+                    "" + usb.getDeviceVolume() + File.separator + root + "data");
 
             try {
                 if ( !protect.exists() ) {
@@ -126,9 +127,9 @@ public class PasswordManager {
             EnvironmentImpl.getEnvironmentMap("root");
 
             File protect = new File(
-                    "" + usb.getDeviceVolume() + File.separator + root + File.separator + ".protected");
+                    "" + usb.getDeviceVolume() + File.separator + root + ".protected");
             File passwords = new File(
-                    "" + usb.getDeviceVolume() + File.separator + root + File.separator + "data");
+                    "" + usb.getDeviceVolume() + File.separator + root + "data");
 
             try {
                 if ( !protect.exists() ) {
@@ -162,4 +163,99 @@ public class PasswordManager {
         return null;
     }
 
+    public static Boolean removePassword(UsbDevice usb, String domainPath, String subDomain) {
+        if ( usb.getIsDetected() ) {
+            // Get Environment root to store config file
+            String root = "";
+            EnvironmentImpl.getEnvironmentMap("root");
+
+            File protect = new File(
+                    "" + usb.getDeviceVolume() + File.separator + root + ".protected");
+            File passwords = new File(
+                    "" + usb.getDeviceVolume() + File.separator + root + "data");
+
+            try {
+                if ( !protect.exists() ) {
+                    return false;
+                }
+                // Recursively create if not exists
+                if ( !passwords.exists() ) {
+                    return false;
+                }
+                File domain = new File(passwords.getAbsolutePath() + File.separator + domainPath);
+                if ( !domain.exists() ) {
+                    return false;
+                }
+
+                FileInputStream fio = new FileInputStream(domain);
+                byte[] data = new byte[(int) domain.length()];
+                fio.read(data);
+                fio.close();
+
+                Algorithm aes = Encipher.getAlgorithm("AES");
+                aes.init();
+                String decryptedData = aes.decrypt(data.toString());
+                if ( decryptedData.split(":")[0].equals(subDomain) ) {
+                    domain.delete();
+                    return true;
+                }
+            } catch (Exception io) {
+                // Fallback
+                return false;
+            }
+        }
+        return false;
+    }
+
+    public static Boolean updatePassword(UsbDevice usb, String domainPath, String subDomain, String password) {
+        if ( usb.getIsDetected() ) {
+            // Get Environment root to store config file
+            String root = "";
+            EnvironmentImpl.getEnvironmentMap("root");
+
+            File protect = new File(
+                    "" + usb.getDeviceVolume() + File.separator + root + ".protected");
+            File passwords = new File(
+                    "" + usb.getDeviceVolume() + File.separator + root + "data");
+
+            try {
+                if ( !protect.exists() ) {
+                    return false;
+                }
+                // Recursively create if not exists
+                if ( !passwords.exists() ) {
+                    return false;
+                }
+                File domain = new File(passwords.getAbsolutePath() + File.separator + domainPath);
+                if ( !domain.exists() ) {
+                    return false;
+                }
+
+                FileInputStream fio = new FileInputStream(domain);
+                byte[] data = new byte[(int) domain.length()];
+                fio.read(data);
+                fio.close();
+
+                Algorithm aes = Encipher.getAlgorithm("AES");
+                aes.init();
+                String decryptedData = aes.decrypt(data.toString());
+                if ( decryptedData.split(":")[0].equals(subDomain) ) {
+                    domain.delete();
+                    new File(passwords.getAbsolutePath() + File.separator + domainPath).createNewFile();
+                    FileOutputStream fo = new FileOutputStream(passwords.getAbsolutePath() + File.separator + domainPath);
+                    fo.write( aes.encrypt(subDomain).getBytes() );
+                    fo.write( aes.encrypt(password).getBytes() );
+                    fo.close();
+                    return true;
+                }
+            } catch (Exception io) {
+                // Fallback
+                return false;
+            }
+        }
+        return false;
+    }
+
 }
+
+// TODO: test
