@@ -9,7 +9,7 @@ import com.github.passdrive.Environment.EnvironmentImpl;
 
 public class configPopulator {
     private static final String CONFIG_FILE = "properties.config";
-    private static boolean isPopulated = false;
+    public static boolean isPopulated = false;
     // Populate peoperties.config to EnvironmentImpl
     public static void populate() {
         EnvironmentImpl.setEnvironmentMap("logged", Boolean.FALSE);
