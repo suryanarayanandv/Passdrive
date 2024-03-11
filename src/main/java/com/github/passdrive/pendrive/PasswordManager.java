@@ -218,12 +218,24 @@ public class PasswordManager {
 
                 Algorithm aes = Encipher.getAlgorithm("AES");
                 aes.init();
-                // TODO: SEED AND WRITE
-                // String decryptedData = aes.decrypt(data.toString());
-                // if ( decryptedData.split(":")[0].equals(subDomain) ) {
-                //     domain.delete();
-                //     return true;
-                // }
+                
+
+                String decryptedData = aes.decrypt(data.toString());
+                String[] subdomainVsPasswords = decryptedData.split(";");
+                StringBuilder newData = new StringBuilder();
+
+                for ( int i = 0; i < subdomainVsPasswords.length; i++) {
+                    String[] temp = subdomainVsPasswords[i].split(":");
+                    if (temp[0].equals(subDomain)) {
+                        continue;
+                    }
+                    newData.append(subdomainVsPasswords[i] + ';');
+                }
+
+                FileOutputStream fio2 = new FileOutputStream(domain);
+                fio2.write(aes.encrypt(newData.toString()).getBytes());
+                fio2.close();
+                return true;
             } catch (Exception io) {
                 // Fallback
                 return false;
@@ -266,15 +278,22 @@ public class PasswordManager {
                 String decryptedData = aes.decrypt(data.toString());
                 String[] subdomainVsPasswords = decryptedData.split(";");
 
-                // TODO: SEED AND REWRITE ?
-                // for (String password : subdomainVsPasswords) {
-                //     String[] temp = password.split(":");
-                //     if (temp[0].equals(subDomain)) {
-                //         pas.addProperty("username", temp[1]);
-                //         pas.addProperty("password", temp[2]);
-                //         break;
-                //     }
-                // }
+                StringBuilder newData = new StringBuilder();
+
+                for ( int i = 0; i < subdomainVsPasswords.length; i++) {
+                    String[] temp = subdomainVsPasswords[i].split(":");
+                    if (temp[0].equals(subDomain)) {
+                        // change password
+                        newData.append(temp[0] + ':' + username + ':' + password + ';');
+                        break;
+                    }
+                    newData.append(subdomainVsPasswords[i] + ';');
+                }
+
+                FileOutputStream fio2 = new FileOutputStream(domain);
+                fio2.write(aes.encrypt(newData.toString()).getBytes());
+                fio2.close();
+                return true;
             } catch (Exception io) {
                 // Fallback
                 return false;
