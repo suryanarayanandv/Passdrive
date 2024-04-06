@@ -3,6 +3,7 @@ package com.github.passdrive;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Random;
 
 import com.github.passdrive.Environment.EnvironmentImpl;
 import com.github.passdrive.pendrive.PasswordManager;
@@ -23,22 +24,29 @@ public class Main {
     // Chrome extention native app host
     // entry point
     public static void main(String[] args) throws IOException {
+        // Initiate Detector thread
+        // I donno if this works? lets try
         if ( !configPopulator.isPopulated ) {
             configPopulator.populate();
         }
 
-        if ( EnvironmentImpl.getEnvironmentMap("detected") == null ) {
-            EnvironmentImpl.setEnvironmentMap("detected", Boolean.FALSE);
+        // if ( EnvironmentImpl.getEnvironmentMap("detected") == null ) {
+        //     EnvironmentImpl.setEnvironmentMap("detected", Boolean.FALSE);
 
-            // Start Detector
-            DetectTaskSchduler detectTaskSchduler = new DetectTaskSchduler();
-            detectTaskSchduler.start();
-        }
+        //     // Start Detector
+        //     DetectTaskSchduler detectTaskSchduler = new DetectTaskSchduler();
+        //     detectTaskSchduler.start();
+
+        //     while (!(detectTaskSchduler.getDetectedDevice() == null)) {
+        //         EnvironmentImpl.setEnvironmentMap("detected", Boolean.TRUE);
+        //     }
+        // }
 
         // TODO: check if the while loop is necessary
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         Boolean isDetected = (Boolean) EnvironmentImpl.getEnvironmentMap("detected");
         Boolean isLogged = (Boolean) EnvironmentImpl.getEnvironmentMap("logged");
+        String root = (String) EnvironmentImpl.getEnvironmentMap("root");
 
         if (isDetected && !isLogged) {
             UsbDevice usb = (UsbDevice) EnvironmentImpl.getEnvironmentMap("usbdevice");
@@ -91,7 +99,7 @@ public class Main {
             }
         }
 
-        if (isDetected && isLogged && !((Boolean) EnvironmentImpl.getEnvironmentMap("removed"))) {
+        if (!((Boolean) EnvironmentImpl.getEnvironmentMap("removed"))) {
             UsbDevice usb = (UsbDevice) EnvironmentImpl.getEnvironmentMap("usbdevice");
             if (usb.isRemoved()) {
                 // TODO: Send message to Thread1 to start detection again
@@ -120,12 +128,22 @@ public class Main {
                     String username = data.get("username").getAsString();
                     String domainPassword = data.get("password").getAsString();
 
-                    if (PasswordManager.storePassword(usb, domainName, subDomainName, username, domainPassword)) {
-                        System.out.println(new Result(AppConstants.SUCCESS, "Domain password set successfully")
-                                .toJson().getAsString());
+                    if (isDetected && isLogged) {
+                        if (PasswordManager.storePassword(root, usb, domainName, subDomainName, username, domainPassword, (String)EnvironmentImpl.getEnvironmentMap("bufferdir"), true, new Random().nextInt())) {
+                            System.out.println(new Result(AppConstants.SUCCESS, "Domain password set successfully")
+                                    .toJson().getAsString());
+                        } else {
+                            System.out.println(
+                                    new Result(AppConstants.FAILURE, "Domain password set failed").toJson().getAsString());
+                        }
                     } else {
-                        System.out.println(
-                                new Result(AppConstants.FAILURE, "Domain password set failed").toJson().getAsString());
+                        if (PasswordManager.storePassword(root, usb, domainName, subDomainName, username, domainPassword, (String)EnvironmentImpl.getEnvironmentMap("bufferdir"), true, new Random().nextInt())) {
+                            System.out.println(new Result(AppConstants.SUCCESS, "Domain password set successfully")
+                                    .toJson().getAsString());
+                        } else {
+                            System.out.println(
+                                    new Result(AppConstants.FAILURE, "Domain password set failed").toJson().getAsString());
+                        }
                     }
                 }
             }
@@ -137,7 +155,7 @@ public class Main {
                     String domainName = data.get("domain").getAsString();
                     String subDomainName = data.get("subdomain").getAsString();
 
-                    JsonObject domainPassword = PasswordManager.getPassword(usb, domainName, subDomainName);
+                    JsonObject domainPassword = PasswordManager.getPassword(root, usb, domainName, subDomainName, usb.getDeviceVolume());
                     if (domainPassword != null) {
                         JsonObject response = new JsonObject();
                         response.add("data", domainPassword);
@@ -158,7 +176,7 @@ public class Main {
                     String domainName = data.get("domain").getAsString();
                     String subDomainName = data.get("subdomain").getAsString();
 
-                    if (PasswordManager.removePassword(usb, domainName, subDomainName)) {
+                    if (PasswordManager.removePassword(root, usb, domainName, subDomainName, (String)EnvironmentImpl.getEnvironmentMap("bufferdir"), true, new Random().nextInt())) {
                         System.out.println(new Result(AppConstants.SUCCESS, "Domain password deleted successfully")
                                 .toJson().getAsString());
                     } else {
@@ -177,7 +195,7 @@ public class Main {
                     String username = data.get("username").getAsString();
                     String domainPassword = data.get("password").getAsString();
 
-                    if (PasswordManager.updatePassword(usb, domainName, subDomainName, username, domainPassword)) {
+                    if (PasswordManager.updatePassword(root, usb, domainName, subDomainName, username, domainPassword, (String)EnvironmentImpl.getEnvironmentMap("bufferdir"), true, new Random().nextInt())) {
                         System.out.println(new Result(AppConstants.SUCCESS, "Domain password updated successfully")
                                 .toJson().getAsString());
                     } else {
