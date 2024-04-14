@@ -60,7 +60,7 @@ public class AES extends Algorithm {
         byte[] salt = new byte[saltLength];
         secureRandom.nextBytes(salt);
 
-        return salt.toString();
+        return Base64.getEncoder().encodeToString(salt);
     }
 
     // Storing secret / iv to Environment

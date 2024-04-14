@@ -77,9 +77,10 @@ public class PasswordManager {
                 fio.read(data);
                 fio.close();
 
+                String Data = new String(data);
                 hash sha = Hash.getAlgorithm("SHA-256");
                 String hashedPassword = sha.doHash(password);
-                return sha.checkHash(data.toString(), hashedPassword);
+                return sha.checkHash(Data, hashedPassword);
             } catch (IOException io) {
                 // Fallback
                 return false;
@@ -168,9 +169,10 @@ public class PasswordManager {
                 fio.read(data);
                 fio.close();
 
+                String Data = new String(data);
                 Algorithm aes = Encipher.getAlgorithm("AES");
                 aes.init();
-                String decryptedData = aes.decrypt(data.toString());
+                String decryptedData = aes.decrypt(Data);
                 String[] subdomainVsPasswords = decryptedData.split(";");
 
                 for (String password : subdomainVsPasswords) {

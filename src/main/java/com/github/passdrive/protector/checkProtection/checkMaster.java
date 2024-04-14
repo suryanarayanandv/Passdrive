@@ -1,5 +1,6 @@
 package com.github.passdrive.protector.checkProtection;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -29,10 +30,20 @@ public class checkMaster {
                     "" + usbDrive.getDeviceVolume() + File.separator + root + ".protected");
 
             try {
-                protect.createNewFile();
+                if (!protect.exists()) {
+                    return false;
+                }
                 FileInputStream fin = new FileInputStream(protect);
-
-                if (fin.readAllBytes().toString().equals(hashedPassword)) {
+                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                int nRead;
+                byte[] data = new byte[16384];
+                while ((nRead = fin.read(data, 0, data.length)) != -1) {
+                    buffer.write(data, 0, nRead);
+                }
+                buffer.flush();
+                byte[] byteArray = buffer.toByteArray();
+                String password = new String(byteArray);
+                if (password.equals(hashedPassword)) {
                     EnvironmentImpl.setEnvironmentMap("status", "true");
                     fin.close();
                     return true;

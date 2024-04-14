@@ -1,5 +1,6 @@
 package com.github.passdrive.Schduler;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -77,7 +78,15 @@ public class StoreJobScheduler implements JobScheduler {
             try {
                 // Read source file to get buffer
                 FileInputStream tempfi = new FileInputStream(srcFile);
-                byte[] buffer = tempfi.readAllBytes();
+                ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+                int nRead;
+                byte[] data = new byte[16384];
+                while ((nRead = tempfi.read(data, 0, data.length)) != -1) {
+                    buffer.write(data, 0, nRead);
+                }
+                buffer.flush();
+                byte[] byteArray = buffer.toByteArray();
                 tempfi.close();
                 srcFile.delete();
 
@@ -86,13 +95,21 @@ public class StoreJobScheduler implements JobScheduler {
                 }
 
                 FileInputStream fi = new FileInputStream(domain);
-                byte[] Buffer = fi.readAllBytes();
+                ByteArrayOutputStream buffer2 = new ByteArrayOutputStream();
+
+                int nRead2;
+                byte[] data2 = new byte[16384];
+                while ((nRead2 = fi.read(data2, 0, data2.length)) != -1) {
+                    buffer2.write(data2, 0, nRead2);
+                }
+                buffer2.flush();
+                byte[] Buffer = buffer2.toByteArray();
                 fi.close();
 
                 FileOutputStream fio = new FileOutputStream(domain);
                 fio.write(Buffer);
                 fio.write(';');
-                fio.write(buffer);
+                fio.write(byteArray);
                 fio.close();
                 this.status = AppConstants.SUCCESS;
             } catch (Exception e) {
@@ -123,7 +140,16 @@ public class StoreJobScheduler implements JobScheduler {
                 try {
                     // Read source file to get buffer
                     FileInputStream tempfi = new FileInputStream(srcFile);
-                    byte[] buffer = tempfi.readAllBytes();
+                    ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+                    
+                    int nRead;
+                    byte[] data = new byte[16384];
+                    while ((nRead = tempfi.read(data, 0, data.length)) != -1) {
+                        buffer.write(data, 0, nRead);
+                    }
+                    buffer.flush();
+
+                    byte[] bufferArray = buffer.toByteArray();
                     tempfi.close();
                     srcFile.delete();
 
@@ -133,7 +159,16 @@ public class StoreJobScheduler implements JobScheduler {
                     }
 
                     FileInputStream fi = new FileInputStream(domain);
-                    byte[] Buffer = fi.readAllBytes();
+                    ByteArrayOutputStream buffer2 = new ByteArrayOutputStream();
+
+                    int nRead2;
+                    byte[] data2 = new byte[16384];
+                    while ((nRead2 = fi.read(data2, 0, data2.length)) != -1) {
+                        buffer2.write(data2, 0, nRead2);
+                    }
+                    buffer2.flush();
+
+                    byte[] Buffer = buffer2.toByteArray();
                     fi.close();
 
                     // "AES/CBC/PKCS5Padding"
@@ -142,7 +177,7 @@ public class StoreJobScheduler implements JobScheduler {
                     String[] passwordsArray = inMemoryPasswords.split(";");
                     for (int j = 0; j < passwordsArray.length; j++) {
                         if (passwordsArray[j].contains(subDomainName)) {
-                            passwordsArray[j] = new String(buffer);
+                            passwordsArray[j] = new String(bufferArray);
                         }
                     }
                     String updatedPasswords = String.join(";", passwordsArray);
@@ -179,7 +214,16 @@ public class StoreJobScheduler implements JobScheduler {
                     }
                     
                     FileInputStream fi = new FileInputStream(domain);
-                    byte[] Buffer = fi.readAllBytes();
+                    ByteArrayOutputStream buffer2 = new ByteArrayOutputStream();
+                    
+                    int nRead2;
+                    byte[] data2 = new byte[16384];
+                    while ((nRead2 = fi.read(data2, 0, data2.length)) != -1) {
+                        buffer2.write(data2, 0, nRead2);
+                    }
+                    buffer2.flush();
+
+                    byte[] Buffer = buffer2.toByteArray();
                     fi.close();
 
                     Algorithm aes = Encipher.getAlgorithm("AES");
